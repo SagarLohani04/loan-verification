@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexGen Prime | Institutional Secured Portal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+        :root {
+            --primary: #10b981;
+            --primary-glow: rgba(16, 185, 129, 0.3);
+            --bg-obsidian: #08090a;
+            --bg-card: #111315;
+            --text-ghost: #94a3b8;
+            --border-glass: rgba(255, 255, 255, 0.05);
+            --danger: #ff4b4b;
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body {
+            background-color: var(--bg-obsidian);
+            color: #fff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Portal Layout */
+        .portal-wrapper {
+            width: 95%;
+            max-width: 1100px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 32px;
+            display: flex;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .portal-nav {
+            width: 300px;
+            background: #000;
+            padding: 50px 30px;
+            border-right: 1px solid var(--border-glass);
+        }
+
+        .brand { font-weight: 800; color: var(--primary); margin-bottom: 50px; display: flex; align-items: center; gap: 10px; }
+
+        .nav-step { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; opacity: 0.3; }
+        .nav-step.active { opacity: 1; }
+        .step-num { width: 30px; height: 30px; border: 1px solid var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .nav-step.active .step-num { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary-glow); }
+
+        /* Main Content */
+        .portal-content { flex: 1; padding: 60px; position: relative; }
+        .panel { display: none; }
+        .panel.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { font-size: 32px; margin: 0 0 10px 0; }
+        .subtitle { color: var(--text-ghost); margin-bottom: 40px; }
+
+        input, select {
+            width: 100%; background: #000; border: 1px solid var(--border-glass);
+            padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 20px; outline: none;
+        }
+        input:focus { border-color: var(--primary); }
+
+        /* Status Card */
+        .status-card {
+            padding: 25px; border-radius: 16px; border-left: 5px solid; margin-bottom: 30px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* Modal / E-Sign Overlay */
+        #sign-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); display: none;
+            justify-content: center; align-items: center; z-index: 100;
+        }
+
+        .modal-content {
+            background: var(--bg-card); padding: 40px; border-radius: 24px;
+            max-width: 500px; width: 90%; text-align: center; border: 1px solid var(--border-glass);
+        }
+
+        .signature-box {
+            height: 150px; background: #000; border: 2px dashed var(--border-glass);
+            margin: 20px 0; border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; color: var(--text-ghost); font-style: italic;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 16px 32px; border-radius: 12px; font-weight: 700; border: none;
+            cursor: pointer; font-size: 14px; text-transform: uppercase;
+        }
+        .btn-primary { background: var(--primary); color: #000; width: 100%; }
+        .btn-ghost { background: transparent; color: var(--text-ghost); border: 1px solid var(--border-glass); }
+
+        /* Mobile */
+        @media (max-width: 800px) {
+            .portal-wrapper { flex-direction: column; border-radius: 0; }
+            .portal-nav { width: 100%; padding: 20px; display: flex; justify-content: space-around; }
+            .nav-step span, .brand { display: none; }
+            .portal-content { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="portal-wrapper">
+    <div class="portal-nav">
+        <div class="brand">NEXGEN PRIME</div>
+        <div class="nav-step active" id="s1"><div class="step-num">01</div> <span>IDENTITY</span></div>
+        <div class="nav-step" id="s2"><div class="step-num">02</div> <span>CAPITAL</span></div>
+        <div class="nav-step" id="s3"><div class="step-num">03</div> <span>E-SIGN</span></div>
+    </div>
+
+    <div class="portal-content">
+        <div class="panel active" id="p1">
+            <h1>Identity Entry</h1>
+            <p class="subtitle">System ready for encrypted verification.</p>
+            <label>Full Legal Name</label>
+            <input type="text" id="name" placeholder="Enter name">
+            <label>Corporate Email</label>
+            <input type="email" id="email" placeholder="name@company.com">
+            <button class="btn btn-primary" onclick="nav(2)">Continue</button>
+        </div>
+
+        <div class="panel" id="p2">
+            <h1>Financial Data</h1>
+            <p class="subtitle">Input loan requirements (₹).</p>
+            <label>Amount (₹)</label>
+            <input type="number" id="amt" placeholder="₹ 500,000">
+            <label>Monthly Income (₹)</label>
+            <input type="number" id="inc" placeholder="₹ 80,000">
+            <button class="btn btn-primary" onclick="runAudit()">Start System Audit</button>
+            <button class="btn btn-ghost" onclick="nav(1)" style="margin-top:10px; width:100%;">Back</button>
+        </div>
+
+        <div class="panel" id="p3">
+            <h1>Audit Result</h1>
+            <div id="statusCard" class="status-card"></div>
+            <div id="auditInfo" style="font-family: 'JetBrains Mono'; background: #000; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+                </div>
+            <button id="esignBtn" class="btn btn-primary" onclick="openSign()">Finalize & E-Sign</button>
+            <button class="btn btn-ghost" onclick="location.reload()" style="margin-top:10px; width:100%;">New Application</button>
+        </div>
+    </div>
+</div>
+
+<div id="sign-modal">
+    <div class="modal-content">
+        <h2>E-Sign Document</h2>
+        <p class="subtitle" id="sign-desc">By signing, you agree to the loan terms.</p>
+        <div class="signature-box" id="sigArea" onclick="applySig()">
+            Click here to apply Digital Signature
+        </div>
+        <button class="btn btn-primary" id="confirmSign" disabled onclick="finishAll()">Confirm Signature</button>
+        <button class="btn btn-ghost" style="margin-top:10px; width:100%;" onclick="closeSign()">Cancel</button>
+    </div>
+</div>
+
+<script>
+    let loanPassed = false;
+
+    function nav(step) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('p' + step).classList.add('active');
+        document.querySelectorAll('.nav-step').forEach(s => s.classList.remove('active'));
+        document.getElementById('s' + step).classList.add('active');
+    }
+
+    function runAudit() {
+        const email = document.getElementById('email').value.toLowerCase();
+        const amt = parseFloat(document.getElementById('amt').value);
+        const inc = parseFloat(document.getElementById('inc').value);
+
+        // Security logic
+        const invalid = ['test.com', 'example.com', 'none.com'];
+        const domain = email.split('@')[1];
+        const isEmailOk = !invalid.includes(domain);
+        const emi = (amt * 1.15) / 24;
+        const isFinanced = inc > (emi * 3);
+
+        loanPassed = isEmailOk && isFinanced;
+
+        const card = document.getElementById('statusCard');
+        const info = document.getElementById('auditInfo');
+        const esign = document.getElementById('esignBtn');
+
+        if (loanPassed) {
+            card.style.borderColor = "var(--primary)";
+            card.innerHTML = "<h3 style='color:var(--primary);margin:0;'>AUDIT PASSED</h3><p style='margin:5px 0 0 0;'>Institutional clearance granted.</p>";
+            esign.style.display = "block";
+        } else {
+            card.style.borderColor = "var(--danger)";
+            card.innerHTML = "<h3 style='color:var(--danger);margin:0;'>AUDIT FAILED</h3><p style='margin:5px 0 0 0;'>Security or financial risk detected.</p>";
+            esign.style.display = "none";
+        }
+
+        info.innerHTML = `
+            <div>APP_ID: #NX-${Math.floor(Math.random()*90000)}</div>
+            <div>EST_EMI: ₹${Math.round(emi).toLocaleString('en-IN')}</div>
+            <div>VERIFIED: ${loanPassed ? 'YES' : 'NO'}</div>
+        `;
+
+        nav(3);
+    }
+
+    function openSign() {
+        document.getElementById('sign-modal').style.display = 'flex';
+    }
+
+    function closeSign() {
+        document.getElementById('sign-modal').style.display = 'none';
+    }
+
+    function applySig() {
+        const box = document.getElementById('sigArea');
+        const name = document.getElementById('name').value;
+        box.innerHTML = `<span style="font-family:'Courier New'; color:var(--primary); font-size:24px;">/s/ ${name}</span>`;
+        box.style.borderStyle = "solid";
+        box.style.borderColor = "var(--primary)";
+        document.getElementById('confirmSign').disabled = false;
+    }
+
+    function finishAll() {
+        const modal = document.querySelector('.modal-content');
+        modal.innerHTML = `
+            <div style="font-size:50px; color:var(--primary);">✔</div>
+            <h2>Loan Executed</h2>
+            <p class="subtitle">Contract Hash: ${Math.random().toString(36).substring(7).toUpperCase()}</p>
+            <p>Funds will be disbursed within 24 business hours.</p>
+            <button class="btn btn-primary" onclick="location.reload()">Finish</button>
+        `;
+    }
+</script>
+
+</body>
+</html>
